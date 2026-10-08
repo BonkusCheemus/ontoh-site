@@ -1,0 +1,2183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="OnToh builds a digital clone of you from the whole of your life, so agents built for someone else can work the way you actually live.">
+<link rel="icon" href="ontoh-icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>OnToh</title>
+<style>
+  :root {
+    color-scheme: light;
+    --paper: #EDEEEA;
+    --paper-raised: #F7F7F3;
+    --paper-sunk: #E4E6E0;
+    --ink: #20262A;
+    --ink-soft: #5B6469;
+    --ink-faint: #7D878A;
+    --line: #D3D7D1;
+    --structure: #3B4A5A;
+    --deep: #26343B;
+    --deep-ink: #F0F1EB;
+    --deep-muted: #BEC8C7;
+    --deep-line: #52616A;
+    --accent: #A6432B;
+    --accent-soft: #F3E7E1;
+    --health: #7A8B6F;
+    --weather: #6E8FA3;
+    --map: #9C7B5C;
+    --calendar: #7E6F94;
+    --reminders: #B08A54;
+    --src-chat: #6E7F9C;
+    --notes: #8A6C8F;
+    --focus: #A6432B;
+    --max-width: 1192px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --paper: #10191E;
+      --paper-raised: #182329;
+      --paper-sunk: #0C1418;
+      --ink: #E9EFEC;
+      --ink-soft: #B4C0C0;
+      --ink-faint: #89999B;
+      --line: #2C3A40;
+      --structure: #AFC2CC;
+      --deep: #18252B;
+      --deep-ink: #E9EFEC;
+      --deep-muted: #AEBBBC;
+      --deep-line: #3C4B51;
+      --accent: #E18A70;
+      --accent-soft: #33251F;
+      --health: #A8C095;
+      --weather: #91B6CA;
+      --map: #C9A27F;
+      --calendar: #B7A7CF;
+      --reminders: #D1B17B;
+      --src-chat: #A9B8D9;
+      --notes: #C3A3C9;
+      --focus: #E18A70;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --paper: #10191E;
+    --paper-raised: #182329;
+    --paper-sunk: #0C1418;
+    --ink: #E9EFEC;
+    --ink-soft: #B4C0C0;
+    --ink-faint: #89999B;
+    --line: #2C3A40;
+    --structure: #AFC2CC;
+    --deep: #18252B;
+    --deep-ink: #E9EFEC;
+    --deep-muted: #AEBBBC;
+    --deep-line: #3C4B51;
+    --accent: #E18A70;
+    --accent-soft: #33251F;
+    --health: #A8C095;
+    --weather: #91B6CA;
+    --map: #C9A27F;
+    --calendar: #B7A7CF;
+    --reminders: #D1B17B;
+    --src-chat: #A9B8D9;
+    --notes: #C3A3C9;
+    --focus: #E18A70;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+  }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.55;
+    text-rendering: optimizeLegibility;
+  }
+
+  a {
+    color: inherit;
+  }
+
+  button,
+  input {
+    font: inherit;
+  }
+
+  button {
+    color: inherit;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 4px;
+  }
+
+  .skip-link {
+    position: fixed;
+    z-index: 10;
+    top: 0.75rem;
+    left: 0.75rem;
+    padding: 0.7rem 1rem;
+    transform: translateY(-160%);
+    border: 1px solid var(--line);
+    border-radius: 0.4rem;
+    background: var(--paper-raised);
+    color: var(--ink);
+  }
+
+  .skip-link:focus {
+    transform: translateY(0);
+  }
+
+  .wrap {
+    width: min(100% - 32px, var(--max-width));
+    margin-inline: auto;
+  }
+
+  .site-header {
+    display: flex;
+    min-height: 82px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .wordmark {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 0.65rem;
+    text-decoration: none;
+  }
+
+  .wordmark svg {
+    width: 38px;
+    height: 38px;
+  }
+
+  .wordmark-name {
+    display: flex;
+    align-items: baseline;
+    gap: 0.45rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+    letter-spacing: -0.055em;
+  }
+
+  .jp {
+    font-family: "Noto Serif JP", "Yu Mincho", serif;
+    font-size: 0.82em;
+    font-weight: 500;
+    letter-spacing: 0;
+  }
+
+  .wordmark-name .jp {
+    color: var(--ink-soft);
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: clamp(1rem, 2.5vw, 2.3rem);
+    font-size: 0.88rem;
+  }
+
+  .nav-links a {
+    text-decoration: none;
+  }
+
+  .nav-links a:not(.nav-cta):hover {
+    color: var(--accent);
+  }
+
+  .nav-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.7rem 0.9rem;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--paper-raised);
+    font-weight: 500;
+  }
+
+  .nav-cta svg,
+  .text-link svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(310px, 0.95fr);
+    align-items: center;
+    gap: clamp(2rem, 6vw, 5.5rem);
+    padding-block: clamp(4.5rem, 10vw, 8.4rem) clamp(4rem, 8vw, 7rem);
+  }
+
+  .eyebrow,
+  .section-kicker,
+  .micro-label,
+  .graph-caption,
+  .table-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    line-height: 1.45;
+    text-transform: uppercase;
+  }
+
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    color: var(--ink-soft);
+  }
+
+  .eyebrow::before {
+    width: 1.45rem;
+    height: 2px;
+    background: var(--accent);
+    content: "";
+  }
+
+  h1,
+  h2,
+  h3,
+  p {
+    margin-top: 0;
+  }
+
+  h1 {
+    max-width: 740px;
+    margin-block: 1.5rem 1.3rem;
+    font-size: clamp(3.55rem, 7.1vw, 6.7rem);
+    font-weight: 500;
+    letter-spacing: -0.075em;
+    line-height: 0.97;
+  }
+
+  h1 span {
+    color: var(--accent);
+  }
+
+  .hero-intro {
+    max-width: 570px;
+    margin-bottom: 1.65rem;
+    color: var(--ink-soft);
+    font-size: clamp(1.05rem, 1.4vw, 1.2rem);
+    line-height: 1.7;
+  }
+
+  .hero-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.9rem 1.2rem;
+  }
+
+  .button-link {
+    display: inline-flex;
+    white-space: nowrap;
+    min-height: 48px;
+    align-items: center;
+    justify-content: center;
+    gap: 0.7rem;
+    padding: 0.75rem 1.05rem;
+    border: 1px solid var(--structure);
+    border-radius: 3px;
+    background: var(--structure);
+    color: var(--paper);
+    font-size: 0.92rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
+  }
+
+  .button-link:hover {
+    transform: translateY(-2px);
+    background: var(--deep);
+    color: var(--deep-ink);
+  }
+
+  .hero-note {
+    margin: 0;
+    color: var(--ink-faint);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+  }
+
+  .hero-visual {
+    position: relative;
+    min-width: 0;
+    padding: clamp(1rem, 2.6vw, 1.65rem);
+    border: 1px solid var(--line);
+    background: var(--paper-raised);
+  }
+
+  .visual-header,
+  .visual-footer,
+  .section-head,
+  .example-head,
+  .sentoh-head,
+  .finance-topline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .visual-header {
+    padding-bottom: 0.9rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .visual-header p,
+  .visual-footer p {
+    margin: 0;
+  }
+
+  .visual-state {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: var(--ink-soft);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+  }
+
+  .state-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--health);
+  }
+
+  .hero-graph {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin-block: 0.7rem;
+    overflow: visible;
+  }
+
+  .hero-graph text,
+  .swarm-graphic text {
+    fill: var(--ink-soft);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10px;
+  }
+
+  .hero-graph .node-label {
+    fill: var(--ink);
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  .hero-graph .center-label {
+    fill: var(--deep-ink);
+    font-family: "IBM Plex Sans", Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .hero-graph .center-sub {
+    fill: var(--deep-muted);
+    font-size: 8px;
+  }
+
+  .graph-line {
+    fill: none;
+    stroke: var(--structure);
+    stroke-width: 1.25;
+  }
+
+  .graph-line.inferred {
+    stroke-dasharray: 3 4;
+  }
+
+  .graph-node {
+    fill: var(--paper-raised);
+    stroke-width: 2;
+  }
+
+  .graph-node.chat { stroke: var(--src-chat); }
+  .graph-node.map { stroke: var(--map); }
+  .graph-node.health { stroke: var(--health); }
+  .graph-node.calendar { stroke: var(--calendar); }
+  .graph-node.weather { stroke: var(--weather); }
+  .graph-core {
+    fill: var(--deep);
+    stroke: var(--deep);
+  }
+
+  .visual-footer {
+    padding-top: 0.85rem;
+    border-top: 1px solid var(--line);
+    color: var(--ink-soft);
+    font-size: 0.72rem;
+  }
+
+  .line-key {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    white-space: nowrap;
+  }
+
+  .line-sample {
+    display: inline-block;
+    width: 18px;
+    border-top: 1.5px solid var(--structure);
+  }
+
+  .line-sample.dashed {
+    border-top-style: dashed;
+  }
+
+  .opening-note {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding-block: 1.2rem;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    color: var(--ink-soft);
+    font-size: 0.86rem;
+  }
+
+  .opening-note p {
+    margin: 0;
+  }
+
+  .opening-note strong {
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .section {
+    padding-block: clamp(4.5rem, 8vw, 7.5rem);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .section-kicker {
+    flex: 0 0 auto;
+    color: var(--accent);
+  }
+
+  .section-head {
+    align-items: flex-start;
+    margin-bottom: clamp(2rem, 4vw, 3.5rem);
+  }
+
+  .section-head h2,
+  .example-head h2,
+  .sentoh-head h2 {
+    margin: 0;
+    font-size: clamp(2.25rem, 4.7vw, 4.25rem);
+    font-weight: 500;
+    letter-spacing: -0.065em;
+    line-height: 1.04;
+  }
+
+  .bottleneck-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 0.7fr);
+    gap: clamp(2rem, 7vw, 7rem);
+    align-items: start;
+  }
+
+  .bottleneck-copy {
+    max-width: 680px;
+    color: var(--ink-soft);
+    font-size: 1.1rem;
+    line-height: 1.75;
+  }
+
+  .bottleneck-copy p:last-child {
+    margin-bottom: 0;
+  }
+
+  .bottleneck-statement {
+    padding: 1.4rem 1.5rem 1.5rem;
+    border-left: 3px solid var(--accent);
+    background: var(--paper-raised);
+  }
+
+  .bottleneck-statement .micro-label {
+    display: block;
+    margin-bottom: 0.8rem;
+    color: var(--ink-faint);
+  }
+
+  .bottleneck-statement p {
+    margin: 0;
+    font-size: clamp(1.4rem, 2.2vw, 2rem);
+    font-weight: 500;
+    letter-spacing: -0.035em;
+    line-height: 1.22;
+  }
+
+  /* Filled bands sit inside the page gutter, so they need their own inner gutter. */
+  .engine-section,
+  .sentoh-section,
+  .swarm-section {
+    padding-inline: clamp(1rem, 4vw, 3rem);
+  }
+
+  .engine-section {
+    background: var(--deep);
+    color: var(--deep-ink);
+  }
+
+  .engine-section .section-kicker {
+    color: var(--accent);
+  }
+
+  .engine-section .section-head {
+    margin-bottom: 2.7rem;
+  }
+
+  .engine-intro {
+    max-width: 570px;
+    margin: 0;
+    color: var(--deep-muted);
+    font-size: 1.05rem;
+    line-height: 1.75;
+  }
+
+  .engine-body {
+    display: grid;
+    grid-template-columns: minmax(250px, 0.78fr) minmax(0, 1.22fr);
+    gap: clamp(2rem, 6vw, 5rem);
+    align-items: start;
+  }
+
+  .source-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.7rem;
+    margin-top: 1.5rem;
+  }
+
+  .source-tile {
+    display: flex;
+    min-height: 58px;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.7rem 0.8rem;
+    border: 1px solid var(--deep-line);
+    color: var(--deep-ink);
+    font-size: 0.88rem;
+  }
+
+  .source-tile:first-child {
+    grid-column: 1 / -1;
+    min-height: 68px;
+    border-color: var(--src-chat);
+  }
+
+  .source-tile strong {
+    display: block;
+    font-weight: 500;
+  }
+
+  .source-tile small {
+    display: block;
+    margin-top: 0.08rem;
+    color: var(--deep-muted);
+    font-size: 0.69rem;
+  }
+
+  .source-mark {
+    width: 9px;
+    height: 9px;
+    flex: 0 0 auto;
+    border-radius: 2px;
+    background: var(--source-color);
+  }
+
+  .source-chat { --source-color: var(--src-chat); }
+  .source-notes { --source-color: var(--notes); }
+  .source-bitacora { --source-color: var(--reminders); }
+  .source-map { --source-color: var(--map); }
+  .source-health { --source-color: var(--health); }
+  .source-calendar { --source-color: var(--calendar); }
+  .source-weather { --source-color: var(--weather); }
+
+  .engine-graph {
+    padding: clamp(1.2rem, 3vw, 2rem);
+    border: 1px solid var(--deep-line);
+  }
+
+  .engine-graph h3 {
+    margin: 0 0 0.35rem;
+    font-size: 1.15rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+
+  .engine-graph > p {
+    max-width: 490px;
+    margin-bottom: 1.5rem;
+    color: var(--deep-muted);
+    font-size: 0.88rem;
+  }
+
+  .engine-graph svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .engine-graph .graph-line {
+    stroke: var(--deep-muted);
+  }
+
+  .engine-graph .graph-node {
+    fill: var(--deep);
+  }
+
+  .engine-graph .graph-core {
+    fill: var(--paper);
+    stroke: var(--paper);
+  }
+
+  .engine-graph .core-label {
+    fill: var(--ink);
+    font-family: "IBM Plex Sans", Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .engine-graph .graph-label {
+    fill: var(--deep-muted);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 9px;
+  }
+
+  .engine-footnote {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 1.35rem;
+    padding-top: 1.1rem;
+    border-top: 1px solid var(--deep-line);
+  }
+
+  .engine-footnote div {
+    color: var(--deep-muted);
+    font-size: 0.76rem;
+  }
+
+  .engine-footnote strong {
+    display: block;
+    margin-bottom: 0.3rem;
+    color: var(--deep-ink);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.67rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .sentoh-section {
+    background: var(--paper-sunk);
+  }
+
+  .sentoh-head {
+    align-items: flex-end;
+    margin-bottom: 2.5rem;
+  }
+
+  .sentoh-head p {
+    max-width: 390px;
+    margin: 0 0 0.25rem;
+    color: var(--ink-soft);
+  }
+
+  .sentoh-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.85fr);
+    gap: clamp(1.5rem, 5vw, 4rem);
+  }
+
+  .sentoh-steps {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+    border: 1px solid var(--line);
+    background: var(--line);
+  }
+
+  .sentoh-step {
+    min-height: 145px;
+    padding: 1.2rem;
+    background: var(--paper-sunk);
+  }
+
+  .sentoh-step .step-no {
+    display: block;
+    margin-bottom: 1.1rem;
+    color: var(--accent);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+  }
+
+  .sentoh-step h3 {
+    margin-bottom: 0.35rem;
+    font-size: 1.02rem;
+    font-weight: 500;
+  }
+
+  .sentoh-step p {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 0.82rem;
+  }
+
+  .sentoh-name-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 100%;
+    padding: 1.5rem;
+    background: var(--deep);
+    color: var(--deep-ink);
+  }
+
+  .sentoh-name-card .jp {
+    display: block;
+    margin-bottom: 0.65rem;
+    color: var(--deep-ink);
+    font-size: 2.5rem;
+    line-height: 1.2;
+  }
+
+  .sentoh-name-card p {
+    max-width: 320px;
+    margin: 0;
+    color: var(--deep-muted);
+  }
+
+  .sentoh-name-card strong {
+    color: var(--deep-ink);
+    font-weight: 500;
+  }
+
+  .examples-section {
+    padding-block: clamp(4.5rem, 8vw, 7rem);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .example-block + .example-block {
+    margin-top: clamp(4.5rem, 8vw, 7rem);
+    padding-top: clamp(4rem, 7vw, 6rem);
+    border-top: 1px solid var(--line);
+  }
+
+  .example-head {
+    align-items: flex-end;
+    margin-bottom: 1.5rem;
+  }
+
+  .example-title-wrap {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.15rem;
+  }
+
+  .example-number {
+    padding-top: 0.5rem;
+    color: var(--accent);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.74rem;
+  }
+
+  .example-head h2 {
+    font-size: clamp(2rem, 4vw, 3.2rem);
+  }
+
+  .fiction-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.48rem;
+    padding: 0.45rem 0.65rem;
+    border: 1px solid var(--line);
+    color: var(--ink-soft);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.035em;
+    white-space: nowrap;
+  }
+
+  .fiction-label::before {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    content: "";
+  }
+
+  .example-description {
+    max-width: 730px;
+    margin-bottom: 1.5rem;
+    color: var(--ink-soft);
+  }
+
+  .example-description strong {
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .adapt-panel,
+  .finance-panel {
+    border: 1px solid var(--line);
+    background: var(--paper-raised);
+  }
+
+  .adapt-toolbar,
+  .finance-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.1rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .toolbar-label {
+    margin: 0;
+    color: var(--ink-soft);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .segmented-control {
+    display: inline-flex;
+    gap: 3px;
+    padding: 3px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--paper);
+  }
+
+  .segmented-control button {
+    min-height: 36px;
+    padding: 0.45rem 0.7rem;
+    border: 0;
+    border-radius: 2px;
+    background: transparent;
+    color: var(--ink-soft);
+    cursor: pointer;
+    font-size: 0.78rem;
+  }
+
+  .segmented-control button[aria-pressed="true"] {
+    background: var(--structure);
+    color: var(--paper);
+  }
+
+  .demo-status {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    clip-path: inset(50%);
+  }
+
+  .adapt-column-labels {
+    display: grid;
+    grid-template-columns: 0.92fr 0.95fr 1.5fr;
+    gap: 1rem;
+    padding: 0.75rem 1.1rem;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink-faint);
+  }
+
+  .adapt-column-labels span:last-child {
+    color: var(--ink);
+  }
+
+  .micro-label {
+    color: var(--ink-faint);
+    font-size: 0.62rem;
+    letter-spacing: 0.055em;
+  }
+
+  .adapt-row {
+    display: grid;
+    grid-template-columns: 0.92fr 0.95fr 1.5fr;
+    gap: 1rem;
+    padding: 1.1rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .adapt-row:last-child {
+    border-bottom: 0;
+  }
+
+  .adapt-cell {
+    min-width: 0;
+  }
+
+  .adapt-cell p {
+    margin: 0.42rem 0 0;
+    color: var(--ink-soft);
+    font-size: 0.84rem;
+    line-height: 1.58;
+  }
+
+  .adapt-cell.clone-cell p {
+    color: var(--ink);
+  }
+
+  .clone-cell .micro-label {
+    color: var(--accent);
+  }
+
+  .source-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-top: 0.65rem;
+  }
+
+  .source-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.2rem 0.42rem;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    color: var(--ink-soft);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.61rem;
+    line-height: 1.3;
+  }
+
+  .source-chip::before {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--source-color, var(--ink-faint));
+    content: "";
+  }
+
+  .chip-chat { --source-color: var(--src-chat); }
+  .chip-map { --source-color: var(--map); }
+  .chip-calendar { --source-color: var(--calendar); }
+  .chip-health { --source-color: var(--health); }
+  .chip-weather { --source-color: var(--weather); }
+  .chip-bitacora { --source-color: var(--reminders); }
+
+  .protein-costs {
+    margin-top: 0.9rem;
+    padding: 0.8rem;
+    border: 1px solid var(--line);
+    background: var(--paper);
+  }
+
+  .protein-costs h4 {
+    margin: 0 0 0.55rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.64rem;
+    font-weight: 500;
+    letter-spacing: 0.035em;
+    text-transform: uppercase;
+  }
+
+  .cost-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.18rem 0.7rem;
+    align-items: center;
+    margin-top: 0.36rem;
+    color: var(--ink-soft);
+    font-size: 0.68rem;
+  }
+
+  .cost-row strong {
+    color: var(--ink);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.66rem;
+    font-weight: 500;
+  }
+
+  .cost-track {
+    grid-column: 1 / -1;
+    height: 4px;
+    overflow: hidden;
+    background: var(--paper-sunk);
+  }
+
+  .cost-fill {
+    display: block;
+    width: var(--bar-width);
+    height: 100%;
+    background: var(--health);
+  }
+
+  .cost-note {
+    margin: 0.55rem 0 0;
+    color: var(--ink-faint);
+    font-size: 0.63rem;
+  }
+
+  .clone-outro {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    margin: 1rem 0 0;
+    padding: 0.9rem 1rem;
+    border-left: 3px solid var(--health);
+    background: var(--paper-raised);
+    color: var(--ink-soft);
+    font-size: 0.84rem;
+  }
+
+  .clone-outro strong {
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .finance-panel {
+    overflow: hidden;
+  }
+
+  .finance-toolbar {
+    align-items: flex-start;
+  }
+
+  .finance-toolbar p {
+    max-width: 540px;
+    margin: 0.35rem 0 0;
+    color: var(--ink-soft);
+    font-size: 0.8rem;
+  }
+
+  .finance-allocation {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .allocation-card {
+    min-height: 160px;
+    padding: 1.2rem;
+    background: var(--paper-raised);
+  }
+
+  .allocation-card .fund-name {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-bottom: 0.6rem;
+    color: var(--ink-soft);
+    font-size: 0.83rem;
+  }
+
+  .fund-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--map);
+  }
+
+  .fund-dot.tape {
+    background: var(--weather);
+  }
+
+  .allocation-amount {
+    display: block;
+    margin-bottom: 0.45rem;
+    font-size: clamp(1.8rem, 3vw, 2.5rem);
+    font-weight: 500;
+    letter-spacing: -0.055em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .allocation-detail {
+    color: var(--ink-faint);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.68rem;
+  }
+
+  .range-wrap {
+    padding: 1rem 1.2rem 1.25rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .range-heading {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.35rem;
+    color: var(--ink-soft);
+    font-size: 0.78rem;
+  }
+
+  .range-heading output {
+    color: var(--ink);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.72rem;
+  }
+
+  input[type="range"] {
+    display: block;
+    width: 100%;
+    height: 32px;
+    margin: 0;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+
+  .range-ends {
+    display: flex;
+    justify-content: space-between;
+    color: var(--ink-faint);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.63rem;
+  }
+
+  .finance-rules {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .finance-rule {
+    min-height: 144px;
+    padding: 1.1rem;
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .finance-rule:nth-child(3n) {
+    border-right: 0;
+  }
+
+  .finance-rule:nth-last-child(-n + 3) {
+    border-bottom: 0;
+  }
+
+  .finance-rule .rule-no {
+    display: block;
+    margin-bottom: 0.55rem;
+    color: var(--accent);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem;
+  }
+
+  .finance-rule h3 {
+    margin-bottom: 0.35rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  .finance-rule p {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 0.75rem;
+    line-height: 1.55;
+  }
+
+  .trade-approval {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.95rem 1.1rem;
+    background: var(--structure);
+    color: var(--paper);
+    font-size: 0.91rem;
+  }
+
+  .approval-mark {
+    display: inline-flex;
+    width: 27px;
+    height: 27px;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--paper);
+    border-radius: 50%;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.72rem;
+  }
+
+  .disclaimer {
+    margin: 0.8rem 0 0;
+    color: var(--ink-soft);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.68rem;
+  }
+
+  .swarm-section {
+    background: var(--paper-sunk);
+  }
+
+  .swarm-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(330px, 1.2fr);
+    align-items: center;
+    gap: clamp(2rem, 7vw, 6rem);
+  }
+
+  .swarm-copy h2 {
+    max-width: 530px;
+    margin: 0 0 1rem;
+    font-size: clamp(2.35rem, 4.5vw, 4rem);
+    font-weight: 500;
+    letter-spacing: -0.065em;
+    line-height: 1.04;
+  }
+
+  .swarm-copy > p {
+    max-width: 560px;
+    color: var(--ink-soft);
+  }
+
+  .swarm-copy .swarm-promise {
+    margin-bottom: 0;
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .swarm-graphic-wrap {
+    padding: 1rem;
+    border: 1px solid var(--line);
+    background: var(--paper-raised);
+  }
+
+  .swarm-graphic {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .swarm-graphic .node-link {
+    fill: none;
+    stroke: var(--line);
+    stroke-width: 1.2;
+  }
+
+  .swarm-graphic .agent-node {
+    fill: var(--paper-raised);
+    stroke: var(--src-chat);
+    stroke-width: 1.5;
+  }
+
+  .swarm-graphic .project-box {
+    fill: var(--deep);
+    stroke: var(--deep);
+  }
+
+  .swarm-graphic .project-label {
+    fill: var(--deep-ink);
+    font-family: "IBM Plex Sans", Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  .swarm-graphic .share-label {
+    fill: var(--accent);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 9px;
+  }
+
+  .swarm-caption {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin: 0.3rem 0 0;
+    padding-inline: 0.2rem;
+    color: var(--ink-faint);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.64rem;
+    letter-spacing: 0.035em;
+    text-transform: uppercase;
+  }
+
+  .principles-grid {
+    display: grid;
+    grid-template-columns: minmax(220px, 0.85fr) minmax(0, 1.15fr);
+    gap: clamp(2rem, 7vw, 7rem);
+  }
+
+  .principles-grid h2 {
+    max-width: 420px;
+    margin: 0;
+    font-size: clamp(2.4rem, 4.7vw, 4rem);
+    font-weight: 500;
+    letter-spacing: -0.065em;
+    line-height: 1.02;
+  }
+
+  .principles-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--line);
+  }
+
+  .principles-list li {
+    display: grid;
+    grid-template-columns: 2.25rem 1fr;
+    gap: 0.8rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 1rem;
+  }
+
+  .principle-number {
+    color: var(--accent);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.68rem;
+  }
+
+  .principles-list strong {
+    font-weight: 500;
+  }
+
+  .site-footer {
+    padding-block: 2rem 2.5rem;
+  }
+
+  .footer-main {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.2rem 2rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .footer-brand {
+    margin: 0;
+    font-weight: 500;
+  }
+
+  .footer-brand .jp {
+    color: var(--ink-soft);
+  }
+
+  .footer-status {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 0.86rem;
+  }
+
+  .copyright {
+    margin: 1rem 0 0;
+    color: var(--ink-faint);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.68rem;
+  }
+
+  @media (max-width: 900px) {
+    .hero {
+      grid-template-columns: minmax(0, 1fr) minmax(260px, 0.82fr);
+      gap: 2rem;
+    }
+
+    h1 {
+      font-size: clamp(3.7rem, 8vw, 5.7rem);
+    }
+
+    .adapt-column-labels,
+    .adapt-row {
+      grid-template-columns: 0.9fr 0.95fr 1.3fr;
+      gap: 0.7rem;
+    }
+
+    .finance-rules {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .finance-rule:nth-child(3n) {
+      border-right: 1px solid var(--line);
+    }
+
+    .finance-rule:nth-child(2n) {
+      border-right: 0;
+    }
+
+    .finance-rule:nth-last-child(-n + 3) {
+      border-bottom: 1px solid var(--line);
+    }
+
+    .finance-rule:nth-last-child(-n + 2) {
+      border-bottom: 0;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .site-header {
+      min-height: 70px;
+    }
+
+    .nav-links {
+      gap: 0.85rem;
+      font-size: 0.78rem;
+    }
+
+    .nav-links a:nth-child(2) {
+      display: none;
+    }
+
+    .nav-cta {
+      padding: 0.58rem 0.65rem;
+    }
+
+    .hero {
+      grid-template-columns: 1fr;
+      padding-top: 4rem;
+    }
+
+    h1 {
+      max-width: 600px;
+      font-size: clamp(3.8rem, 13vw, 5.4rem);
+    }
+
+    .hero-visual {
+      max-width: 560px;
+    }
+
+    .bottleneck-grid,
+    .engine-body,
+    .sentoh-grid,
+    .swarm-grid,
+    .principles-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .bottleneck-grid {
+      gap: 1.6rem;
+    }
+
+    .section-head {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.8rem;
+    }
+
+    .section-head h2 br {
+      display: none;
+    }
+
+    .engine-graph {
+      padding: 1rem;
+    }
+
+    .sentoh-head {
+      display: grid;
+      align-items: start;
+      gap: 1rem;
+    }
+
+    .sentoh-steps {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .sentoh-step {
+      min-height: 132px;
+      padding: 0.9rem;
+    }
+
+    .example-head {
+      align-items: flex-start;
+    }
+
+    .example-title-wrap {
+      gap: 0.75rem;
+    }
+
+    .fiction-label {
+      max-width: 135px;
+      white-space: normal;
+    }
+
+    .adapt-column-labels {
+      display: none;
+    }
+
+    .adapt-row {
+      grid-template-columns: 1fr;
+      gap: 0.9rem;
+      padding: 1rem;
+    }
+
+    .adapt-cell {
+      padding-left: 0.8rem;
+      border-left: 2px solid var(--line);
+    }
+
+    .adapt-cell.clone-cell {
+      border-color: var(--accent);
+    }
+
+    .adapt-cell p {
+      margin-top: 0.25rem;
+    }
+
+    .finance-toolbar {
+      display: grid;
+    }
+
+    .finance-toolbar .segmented-control {
+      justify-self: start;
+    }
+
+    .finance-rules {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .swarm-grid {
+      gap: 1.8rem;
+    }
+
+    .principles-grid {
+      gap: 1.7rem;
+    }
+  }
+
+  @media (max-width: 440px) {
+    .wrap {
+      width: min(100% - 32px, var(--max-width));
+    }
+
+    .site-header {
+      gap: 0.5rem;
+    }
+
+    .wordmark {
+      gap: 0.4rem;
+    }
+
+    .wordmark svg {
+      width: 32px;
+      height: 32px;
+    }
+
+    .wordmark-name {
+      gap: 0.28rem;
+      font-size: 1.15rem;
+    }
+
+    .nav-links {
+      gap: 0.55rem;
+      font-size: 0.72rem;
+    }
+
+    .nav-links a:first-child {
+      display: none;
+    }
+
+    .nav-cta {
+      min-height: 40px;
+      gap: 0.35rem;
+      padding: 0.45rem 0.55rem;
+    }
+
+    .hero {
+      gap: 2rem;
+      padding-top: 3.1rem;
+    }
+
+    h1 {
+      font-size: clamp(3.4rem, 15vw, 4.25rem);
+    }
+
+    .hero-intro {
+      font-size: 1rem;
+    }
+
+    .hero-visual {
+      padding: 0.85rem;
+    }
+
+    .visual-header {
+      align-items: flex-start;
+    }
+
+    .visual-footer {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .opening-note {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .source-list {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .engine-footnote {
+      grid-template-columns: 1fr;
+      gap: 0.8rem;
+    }
+
+    .example-head {
+      display: grid;
+      gap: 0.85rem;
+    }
+
+    .fiction-label {
+      max-width: none;
+      justify-self: start;
+    }
+
+    .adapt-toolbar {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .segmented-control {
+      width: 100%;
+    }
+
+    .segmented-control button {
+      flex: 1 1 0;
+      padding-inline: 0.35rem;
+      font-size: 0.72rem;
+    }
+
+    .finance-allocation {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .allocation-card {
+      min-height: 142px;
+      padding: 0.9rem;
+    }
+
+    .allocation-card .fund-name {
+      align-items: flex-start;
+      font-size: 0.75rem;
+    }
+
+    .allocation-amount {
+      font-size: 1.55rem;
+    }
+
+    .finance-rules {
+      grid-template-columns: 1fr;
+    }
+
+    .finance-rule,
+    .finance-rule:nth-child(3n),
+    .finance-rule:nth-child(2n),
+    .finance-rule:nth-last-child(-n + 2) {
+      min-height: auto;
+      padding: 0.9rem 1rem;
+      border-right: 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .finance-rule:last-child {
+      border-bottom: 0;
+    }
+
+    .swarm-graphic-wrap {
+      padding: 0.55rem;
+    }
+
+    .swarm-caption {
+      font-size: 0.56rem;
+    }
+
+    .footer-main {
+      flex-direction: column;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      scroll-behavior: auto !important;
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+    }
+  }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Serif+JP:wght@500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="wrap" id="top">
+  <header class="site-header">
+    <a class="wordmark" href="#top" aria-label="OnToh home">
+      <svg viewBox="0 0 512 512" aria-hidden="true" focusable="false">
+<rect width="512" height="512" rx="102.4" fill="var(--paper-sunk)"/>
+<path d="M393.65174468085104 75.79778723404257C352.4738723404255 87.17072340425534 277.5693617021277 95.79846808510638 214.42995744680852 100.1123404255319C217.56731914893618 105.99489361702126 221.0968510638298 115.79914893617024 221.88119148936173 121.6817021276596C286.58927659574465 118.15217021276595 363.8468085106383 109.91659574468088 413.6524255319149 96.19063829787234ZM226.97940425531917 135.40765957446808C236.7836595744681 149.91795744680851 245.80357446808512 170.3108085106383 248.94093617021278 184.03676595744682L273.25548936170213 174.62468085106383C269.3337872340426 161.29089361702128 259.9217021276596 141.6823829787234 249.7252765957447 127.17208510638301ZM293.25617021276594 124.81906382978724C300.3152340425532 141.29021276595745 307.37429787234043 162.46740425531917 310.1194893617021 176.58553191489364L334.8262127659574 168.74212765957446C332.0810212765957 155.01617021276596 324.6297872340425 134.2311489361702 316.7863829787234 118.15217021276595ZM263.8434042553191 340.1205106382979V400.9068936170213C263.8434042553191 427.1822978723404 271.68680851063834 434.2413617021277 302.66825531914895 434.2413617021277C308.55080851063826 434.2413617021277 345.8069787234043 434.2413617021277 352.4738723404255 434.2413617021277C376.00408510638295 434.2413617021277 383.45531914893616 425.6136170212766 386.2005106382978 390.3182978723404C379.14144680851064 388.35744680851064 368.16068085106383 384.43574468085103 362.6702978723405 380.5140425531915C361.88595744680856 407.18161702127657 359.5329361702128 410.31897872340426 349.3365106382979 410.31897872340426C341.4931063829787 410.31897872340426 310.90382978723403 410.31897872340426 305.4134468085107 410.31897872340426C292.0796595744681 410.31897872340426 290.1188085106383 409.1424680851064 290.1188085106383 400.51472340425534V340.1205106382979ZM227.76374468085106 343.25787234042554C221.88119148936173 367.18025531914896 210.50825531914896 396.20085106382976 194.82144680851064 413.4563404255319L217.56731914893618 426.3979574468085C234.0384680851064 407.5737872340425 244.62706382978723 376.5923404255319 251.29395744680852 351.4934468085106ZM372.86672340425537 349.1404255319149C391.6908936170213 372.2784680851064 409.7307234042553 404.04425531914893 416.3976170212766 425.6136170212766L440.32000000000005 414.2406808510638C432.86876595744684 392.67131914893616 414.8289361702127 361.68987234042555 394.43608510638296 339.336170212766ZM285.8049361702128 327.1788936170213C303.84476595744684 338.944 323.8454468085106 356.9838297872341 332.86536170212764 370.3176170212766L352.0817021276596 355.4151489361702C343.0617872340425 342.8657021276596 323.0611063829788 326.0023829787234 305.4134468085107 314.62944680851064H417.1819574468085V187.56629787234044H377.9649361702128C390.12221276595744 170.3108085106383 405.02468085106386 145.99625531914893 416.7897872340426 124.81906382978724L391.6908936170213 113.44612765957447C383.06314893617025 134.2311489361702 366.592 163.64391489361702 354.43472340425535 181.68374468085108L366.1998297872341 187.56629787234044H230.11676595744683V210.31217021276595H389.3378723404255V239.72493617021277H237.96017021276597V262.47080851063834H389.3378723404255V291.8835744680851H228.54808510638298V314.62944680851064H303.0604255319149ZM188.15455319148938 83.24902127659578C162.2713191489362 95.79846808510638 115.2108936170213 106.77923404255318 74.42519148936172 114.2304680851064C77.56255319148937 119.7208510638298 81.48425531914896 129.52510638297872 83.05293617021277 135.79982978723405C99.13191489361704 133.44680851063833 116.38740425531915 130.30944680851064 133.6428936170213 126.77991489361705V187.95846808510638H76.3860425531915V215.01821276595746H129.32902127659577C115.99523404255321 259.7256170212766 93.24936170212767 311.09991489361704 71.68000000000002 339.7283404255319C76.3860425531915 346.78740425531913 83.44510638297874 358.1603404255319 86.5824680851064 366.39591489361703C103.44578723404257 342.8657021276596 120.30910638297874 305.2173617021277 133.6428936170213 267.17685106382976V436.2022127659574H161.48697872340426V262.86297872340424C174.03642553191492 278.9419574468085 188.93889361702128 299.3348085106383 195.2136170212766 309.92340425531916L212.46910638297874 287.5697021276596C205.01787234042555 278.5497872340426 172.0755744680851 244.0388085106383 161.48697872340426 234.62672340425533V215.01821276595746H209.72391489361704V187.95846808510638H161.48697872340426V120.11302127659576C179.52680851063832 115.40697872340428 196.3901276595745 109.91659574468088 210.50825531914896 104.03404255319151Z" fill="var(--structure)"/>
+</svg>
+      <span class="wordmark-name">OnToh <span class="jp" lang="ja">穏当</span></span>
+    </a>
+    <nav class="nav-links" aria-label="Main navigation">
+      <a href="#engine">How it works</a>
+      <a href="#sentoh">SenToh</a>
+      <a class="nav-cta" href="#examples">See the examples
+        <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M2.5 8h10M8.5 3.5 13 8l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      </a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <div class="eyebrow">A personal context layer for AI</div>
+        <h1 id="hero-title">Not your<br>assistant.<br><span>You.</span></h1>
+        <p class="hero-intro">OnToh builds a digital clone of you from the whole of your life: what you say, where you go, how you sleep, what you spend, and what you write down. Agents built for someone else can then work the way you actually live.</p>
+        <div class="hero-actions">
+          <a class="button-link" href="#examples">See it adapt
+            <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2.5v10M3.5 8l4.5 4.5L12.5 8" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          </a>
+          <p class="hero-note">WORKING PROTOTYPE · EARLY ACCESS NOT YET OPEN</p>
+        </div>
+      </div>
+      <div class="hero-visual" role="group" aria-label="Illustration of a personal graph connecting life sources">
+        <div class="visual-header">
+          <p class="micro-label">A living picture of you</p>
+          <span class="visual-state"><span class="state-dot"></span>PERSONAL GRAPH</span>
+        </div>
+        <svg class="hero-graph" viewBox="0 0 460 300" role="img" aria-labelledby="hero-graph-title hero-graph-desc">
+          <title id="hero-graph-title">Personal context graph</title>
+          <desc id="hero-graph-desc">Chat, location, health, calendar, and weather connect to one personal context. Solid links are stated. Dashed links are hypotheses.</desc>
+          <path class="graph-line" d="M230 145 103 73M230 145 357 72M230 145 90 222M230 145 360 222M230 145 230 38" />
+          <path class="graph-line inferred" d="M103 73 90 222M357 72 360 222M103 73 230 38" />
+          <circle class="graph-node chat" cx="103" cy="73" r="29" />
+          <circle class="graph-node map" cx="357" cy="72" r="29" />
+          <circle class="graph-node health" cx="90" cy="222" r="29" />
+          <circle class="graph-node calendar" cx="360" cy="222" r="29" />
+          <circle class="graph-node weather" cx="230" cy="38" r="25" />
+          <circle class="graph-core" cx="230" cy="145" r="51" />
+          <text class="node-label" x="103" y="77" text-anchor="middle">Chat</text>
+          <text class="node-label" x="357" y="76" text-anchor="middle">Map</text>
+          <text class="node-label" x="90" y="226" text-anchor="middle">Health</text>
+          <text class="node-label" x="360" y="226" text-anchor="middle">Calendar</text>
+          <text x="230" y="41" text-anchor="middle">Weather</text>
+          <text class="center-label" x="230" y="141" text-anchor="middle">Your</text>
+          <text class="center-label" x="230" y="157" text-anchor="middle">context</text>
+          <text x="230" y="283" text-anchor="middle">Signals connected over time</text>
+        </svg>
+        <div class="visual-footer">
+          <span class="line-key"><i class="line-sample"></i>Stated by you</span>
+          <span class="line-key"><i class="line-sample dashed"></i>Inferred hypothesis</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="opening-note">
+      <p><strong>OnToh = Ontology + <span class="jp" lang="ja">穏当</span></strong></p>
+      <p>Proper, balanced. Built around your actual life.</p>
+    </div>
+
+    <section class="section" aria-labelledby="bottleneck-title">
+      <div class="section-head">
+        <span class="section-kicker">01 / THE SHIFT</span>
+        <h2 id="bottleneck-title">The bottleneck <br>is human now.</h2>
+      </div>
+      <div class="bottleneck-grid">
+        <div class="bottleneck-copy">
+          <p>AI now works on open problems in mathematics and writes production code. Most people still use it as a better search box. A small group gets far more from it, and fewer still earn from it.</p>
+          <p>The gap is not the model. It is that the model does not know you, and you do not know how to set it up. OnToh gives it the context and setup to work with your life.</p>
+        </div>
+        <aside class="bottleneck-statement">
+          <span class="micro-label">The missing layer</span>
+          <p>Capability is here.<br>Personal context is not.</p>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section engine-section" id="engine" aria-labelledby="engine-title">
+      <div class="section-head">
+        <span class="section-kicker">02 / THE ONTOLOGY ENGINE</span>
+        <div>
+          <h2 id="engine-title">A clone built from <br>the whole picture.</h2>
+          <p class="engine-intro">Chat is the main capture path. Notes, a dated factual log, and everyday signals add detail. OnToh connects them into a personal graph of what affects what.</p>
+        </div>
+      </div>
+      <div class="engine-body">
+        <div>
+          <span class="micro-label">Sources it learns from</span>
+          <div class="source-list" aria-label="OnToh information sources">
+            <div class="source-tile source-chat"><span class="source-mark"></span><span><strong>Chat</strong><small>The everyday capture path</small></span></div>
+            <div class="source-tile source-notes"><span class="source-mark"></span><strong>Notes</strong></div>
+            <div class="source-tile source-bitacora"><span class="source-mark"></span><strong>Bitácora</strong></div>
+            <div class="source-tile source-map"><span class="source-mark"></span><strong>Map / location</strong></div>
+            <div class="source-tile source-health"><span class="source-mark"></span><strong>Health</strong></div>
+            <div class="source-tile source-calendar"><span class="source-mark"></span><strong>Calendar</strong></div>
+            <div class="source-tile source-weather"><span class="source-mark"></span><strong>Weather</strong></div>
+          </div>
+        </div>
+        <div class="engine-graph">
+          <h3>Every connection has a source.</h3>
+          <p>Links you state stay distinct from patterns the system infers. Inferred links are hypotheses, never diagnoses.</p>
+          <svg viewBox="0 0 540 195" role="img" aria-labelledby="engine-graph-title engine-graph-desc">
+            <title id="engine-graph-title">Personal graph with stated and inferred links</title>
+            <desc id="engine-graph-desc">Several data sources connect to a central personal graph. Solid edges are stated by the person, dashed edges are system-inferred hypotheses.</desc>
+            <path class="graph-line" d="M62 48 250 96M62 145 250 96M478 48 290 96M478 145 290 96M270 29 270 75" />
+            <path class="graph-line inferred" d="M62 48 62 145M478 48 478 145M270 29 62 48" />
+            <circle class="graph-node chat" cx="62" cy="48" r="15" />
+            <circle class="graph-node health" cx="62" cy="145" r="15" />
+            <circle class="graph-node map" cx="478" cy="48" r="15" />
+            <circle class="graph-node calendar" cx="478" cy="145" r="15" />
+            <circle class="graph-node weather" cx="270" cy="29" r="13" />
+            <circle class="graph-core" cx="270" cy="96" r="35" />
+            <text class="graph-label" x="62" y="78" text-anchor="middle">CHAT</text>
+            <text class="graph-label" x="62" y="176" text-anchor="middle">HEALTH</text>
+            <text class="graph-label" x="478" y="78" text-anchor="middle">MAP</text>
+            <text class="graph-label" x="478" y="176" text-anchor="middle">CALENDAR</text>
+            <text class="graph-label" x="270" y="11" text-anchor="middle">WEATHER</text>
+            <text class="core-label" x="270" y="100" text-anchor="middle">PERSON</text>
+          </svg>
+          <div class="engine-footnote">
+            <div><strong>Stated</strong>What you told it, kept as yours.</div>
+            <div><strong>Inferred</strong>A pattern to check, not a diagnosis.</div>
+            <div><strong>Private by default</strong>Designed to stay encrypted and on-device.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section sentoh-section" id="sentoh" aria-labelledby="sentoh-title">
+      <div class="sentoh-head">
+        <div>
+          <span class="section-kicker">03 / THE AGENT MARKETPLACE</span>
+          <h2 id="sentoh-title">SenToh: pull an expert's agent. <br>Run it as yourself.</h2>
+        </div>
+        <p>Creators publish agents as plain text. Read one before you add it. Your clone adapts it to your body, budget, schedule, and city.</p>
+      </div>
+      <div class="sentoh-grid">
+        <div class="sentoh-steps">
+          <article class="sentoh-step">
+            <span class="step-no">01</span>
+            <h3>Read the agent</h3>
+            <p>See its instructions before you choose it.</p>
+          </article>
+          <article class="sentoh-step">
+            <span class="step-no">02</span>
+            <h3>Add what fits</h3>
+            <p>Pick an expert's approach, not their life.</p>
+          </article>
+          <article class="sentoh-step">
+            <span class="step-no">03</span>
+            <h3>Make it yours</h3>
+            <p>Your clone adjusts the rules to your context.</p>
+          </article>
+          <article class="sentoh-step">
+            <span class="step-no">04</span>
+            <h3>Pay the creator</h3>
+            <p>The creator earns when people use the agent.</p>
+          </article>
+        </div>
+        <aside class="sentoh-name-card">
+          <div><span class="jp" lang="ja">銭湯</span><p><strong>SenToh</strong> is named for the neighbourhood bathhouse: a shared place people return to, each in their own way.</p></div>
+          <p class="micro-label">Expertise, shared on your terms</p>
+        </aside>
+      </div>
+    </section>
+
+    <section class="examples-section" id="examples" aria-labelledby="examples-title">
+      <div class="example-block" aria-labelledby="training-title">
+        <div class="example-head">
+          <div class="example-title-wrap">
+            <span class="example-number">04A</span>
+            <div><span class="section-kicker">TRAINING + FOOD</span><h2 id="training-title">Keep the principle. <br>Change the circumstances.</h2></div>
+          </div>
+          <span class="fiction-label">Illustrative · fictional people</span>
+        </div>
+        <p class="example-description"><strong>Coach Dale, Texas</strong>, trains at a 24-hour gym at 5:30, eats beef daily, and follows a six-day plan built around steak and whey. <strong>Kenta, 23, a grad student in Japan</strong>, bikes and takes the train, spends about ¥40,000 a month on food, finishes lab around 21:00, and sleeps around 01:00. His municipal gym costs about ¥400 per visit and has no live crowd feed.</p>
+        <div class="adapt-panel">
+          <div class="adapt-toolbar">
+            <p class="toolbar-label">Coach Dale's training agent</p>
+            <div class="segmented-control" role="group" aria-label="Choose training plan view">
+              <button type="button" data-training-mode="downloaded" aria-pressed="false">As downloaded</button>
+              <button type="button" data-training-mode="adapted" aria-pressed="true">Adapted for Kenta</button>
+            </div>
+          </div>
+          <div class="adapt-column-labels micro-label" aria-hidden="true"><span>Dale's agent</span><span>What it assumes</span><span>Kenta's clone</span></div>
+          <div id="training-rows" aria-label="Training plan adaptation"></div>
+          <p class="demo-status" id="training-status" aria-live="polite">Showing the plan adapted for Kenta.</p>
+        </div>
+        <p class="clone-outro"><span aria-hidden="true">↳</span><span>The clone keeps Dale's principles: progressive overload, enough protein, and regular sleep. It replaces his circumstances.</span></p>
+      </div>
+
+      <div class="example-block" aria-labelledby="investing-title">
+        <div class="example-head">
+          <div class="example-title-wrap">
+            <span class="example-number">04B</span>
+            <div><span class="section-kicker">INVESTING</span><h2 id="investing-title">Two strategies. <br>One Kenta.</h2></div>
+          </div>
+          <span class="fiction-label">Illustrative · fictional people</span>
+        </div>
+        <p class="example-description">Kenta follows two creators with opposite methods. <strong>Maple Value</strong>, a Canadian investor, buys US stocks below an estimate of their worth and holds for years. <strong>Tape Reader</strong> buys what rose most over the past year, cuts losers fast, and rebalances monthly. They think in dollars. Kenta earns yen.</p>
+        <div class="finance-panel">
+          <div class="finance-toolbar">
+            <div>
+              <span class="micro-label">Kenta's starting allocation</span>
+              <p>Last spring, Kenta sold during a dip and talked about it in chat. His clone starts with more of the calmer value approach. Move the slider to explore the split.</p>
+            </div>
+            <span class="fiction-label">One clone · two agents</span>
+          </div>
+          <div class="finance-allocation" aria-live="polite" aria-label="Monthly allocation in Japanese yen">
+            <div class="allocation-card">
+              <span class="fund-name"><i class="fund-dot"></i>Maple Value</span>
+              <output class="allocation-amount" id="maple-amount">¥21,000</output>
+              <span class="allocation-detail"><span id="maple-share">70</span>% · long-hold value</span>
+            </div>
+            <div class="allocation-card">
+              <span class="fund-name"><i class="fund-dot tape"></i>Tape Reader</span>
+              <output class="allocation-amount" id="tape-amount">¥9,000</output>
+              <span class="allocation-detail"><span id="tape-share">30</span>% · monthly momentum</span>
+            </div>
+          </div>
+          <div class="range-wrap">
+            <label class="range-heading" for="allocation-range"><span>Maple Value share</span><output id="allocation-output" for="allocation-range">70% / 30%</output></label>
+            <input id="allocation-range" type="range" min="0" max="100" step="5" value="70" aria-label="Maple Value share of the monthly allocation" aria-describedby="allocation-help">
+            <div class="range-ends" id="allocation-help"><span>0% value</span><span>100% value</span></div>
+          </div>
+          <div class="finance-rules">
+            <article class="finance-rule"><span class="rule-no">01 / BUDGET</span><h3>Buffer before investing</h3><p>Bitácora shows about ¥30,000 a month after rent and food. The clone keeps a three-month cash buffer first.</p></article>
+            <article class="finance-rule"><span class="rule-no">02 / RISK</span><h3>Learn from what he did</h3><p>That past sale is a clue about Kenta's comfort with losses, not a questionnaire score or a diagnosis.</p></article>
+            <article class="finance-rule"><span class="rule-no">03 / CLASH</span><h3>Net opposing orders</h3><p>If one agent wants to buy what the other wants to sell, the clone nets the orders instead of paying fees twice.</p></article>
+            <article class="finance-rule"><span class="rule-no">04 / CURRENCY</span><h3>Show the yen exposure</h3><p>Both agents think in dollars. The clone translates the combined exposure into the yen Kenta earns and spends.</p></article>
+            <article class="finance-rule"><span class="rule-no">05 / ACCOUNTS</span><h3>Match the holding period</h3><p>The long-hold sleeve goes in NISA. The high-turnover sleeve uses a regular account because a NISA sale does not free its quota until the following year.</p></article>
+            <article class="finance-rule"><span class="rule-no">06 / APPROVAL</span><h3>Propose, then wait</h3><p>The clone can prepare a plan. It cannot place a trade without Kenta's approval.</p></article>
+          </div>
+          <div class="trade-approval"><span class="approval-mark" aria-hidden="true">✓</span><span>The clone proposes. Kenta approves every trade.</span></div>
+        </div>
+        <p class="disclaimer">Illustrative example with fictional people. Not investment advice.</p>
+      </div>
+    </section>
+
+    <section class="section swarm-section" aria-labelledby="swarm-title">
+      <div class="swarm-grid">
+        <div class="swarm-copy">
+          <span class="section-kicker">05 / SHARED AGENT WORK</span>
+          <h2 id="swarm-title">A team of agents. <br>A project that pays.</h2>
+          <p>Only a few labs run ten thousand agents at once. Yet people already pay for top-tier AI subscriptions and run capable agents. SenToh lets them point those agents at one shared project, with each contributor taking a share of what it earns.</p>
+          <p class="swarm-promise">Train your own freelancer. Then put it to work with others.</p>
+        </div>
+        <figure class="swarm-graphic-wrap">
+          <svg class="swarm-graphic" viewBox="0 0 530 230" role="img" aria-labelledby="swarm-graphic-title swarm-graphic-desc">
+            <title id="swarm-graphic-title">Independent agents contribute to a shared project</title>
+            <desc id="swarm-graphic-desc">Several people's agents feed work into one shared project. A portion of the project's earnings flows back to contributors.</desc>
+            <path class="node-link" d="M93 49 228 102M93 92 228 112M93 137 228 118M93 180 228 128M302 115 434 115" />
+            <circle class="agent-node" cx="59" cy="49" r="13" /><circle class="agent-node" cx="93" cy="49" r="6" />
+            <circle class="agent-node" cx="59" cy="92" r="13" /><circle class="agent-node" cx="93" cy="92" r="6" />
+            <circle class="agent-node" cx="59" cy="137" r="13" /><circle class="agent-node" cx="93" cy="137" r="6" />
+            <circle class="agent-node" cx="59" cy="180" r="13" /><circle class="agent-node" cx="93" cy="180" r="6" />
+            <rect class="project-box" x="224" y="78" width="100" height="74" rx="3" />
+            <text class="project-label" x="274" y="108" text-anchor="middle">SHARED</text>
+            <text class="project-label" x="274" y="124" text-anchor="middle">PROJECT</text>
+            <path class="node-link" d="M429 115h38m-10-9 10 9-10 9" />
+            <circle class="agent-node" cx="494" cy="115" r="16" />
+            <text class="share-label" x="59" y="218" text-anchor="middle">YOUR AGENT</text>
+            <text class="share-label" x="274" y="174" text-anchor="middle">WORK + EARNINGS</text>
+            <text class="share-label" x="494" y="151" text-anchor="middle">SHARE</text>
+          </svg>
+          <figcaption class="swarm-caption"><span>Many independent agents</span><span>One shared outcome</span></figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="principles-title">
+      <div class="principles-grid">
+        <div>
+          <span class="section-kicker">06 / PRINCIPLES</span>
+          <h2 id="principles-title">Useful because <br>it stays yours.</h2>
+        </div>
+        <ul class="principles-list">
+          <li><span class="principle-number">01</span><span><strong>Your data stays yours.</strong> Built to keep it encrypted and on-device by default. Never sold.</span></li>
+          <li><span class="principle-number">02</span><span><strong>Agents are readable text.</strong> See what one does before you add it.</span></li>
+          <li><span class="principle-number">03</span><span><strong>The clone suggests.</strong> You decide what happens next.</span></li>
+          <li><span class="principle-number">04</span><span><strong>Inferences stay labelled.</strong> Patterns are hypotheses, not diagnoses.</span></li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-main">
+      <p class="footer-brand">OnToh <span class="jp" lang="ja">(穏当)</span> · SenToh <span class="jp" lang="ja">(銭湯)</span></p>
+      <p class="footer-status">Working prototype. Early access opens soon.</p>
+    </div>
+    <p class="copyright">© 2026 OnToh</p>
+  </footer>
+</div>
+<script>
+  (() => {
+    const costRows = [
+      { food: "Chicken breast", yen: 70 },
+      { food: "Eggs", yen: 84 },
+      { food: "Natto", yen: 54 },
+      { food: "Tofu", yen: 46 },
+      { food: "Canned mackerel", yen: 140 }
+    ];
+
+    const costTable = () => {
+      const max = Math.max(...costRows.map((item) => item.yen));
+      const rows = costRows.map((item) => {
+        const width = Math.round((item.yen / max) * 100);
+        return `<div class="cost-row"><span>${item.food}</span><strong>¥${item.yen}</strong><span class="cost-track" aria-hidden="true"><span class="cost-fill" style="--bar-width:${width}%"></span></span></div>`;
+      }).join("");
+      return `<div class="protein-costs" aria-label="Illustrative cost comparison per 20 grams of protein"><h4>Cost per 20 g protein · illustrative prices</h4>${rows}<p class="cost-note">Example prices only. Actual prices vary by shop and date.</p></div>`;
+    };
+
+    const trainingRows = {
+      adapted: [
+        {
+          rule: "Checks the live occupancy count before the 5:30 drive to a 24-hour gym.",
+          assumption: "A live crowd feed, a car, and an early-morning schedule.",
+          clone: "Kenta's gym has no feed. The clone learns quieter hours from Map visits and his Chat complaints, then checks Calendar gaps: Tuesday and Thursday at 13:00, plus Saturday morning.",
+          sources: ["Map", "Chat", "Calendar"]
+        },
+        {
+          rule: "Targets about 1 g protein per lb, mostly from two steaks a day and whey.",
+          assumption: "Beef every day fits the local food prices and routine.",
+          clone: "Keeps the protein target in context: about 1.6–2.2 g per kg bodyweight from chicken breast (<span class='jp' lang='ja'>鶏むね</span>), eggs, natto, tofu, and canned mackerel. Checks for half-price stickers after about 20:00 on his route home.",
+          sources: ["Map", "Chat", "Bitácora"],
+          detail: "costs"
+        },
+        {
+          rule: "Tracks whey by the pound and buys when a large bag gets cheaper.",
+          assumption: "US brands, US units, and the creator's shopping pattern.",
+          clone: "Tracks a large bag of a domestic brand in yen per kilogram. Bitácora records prices and the clone waits for a lower price per kg.",
+          sources: ["Bitácora"]
+        },
+        {
+          rule: "Sleeps 22:00–05:00 and trains before work.",
+          assumption: "A 05:00 wake-up works for this person's sleep and day.",
+          clone: "Keeps regular sleep, anchors Kenta's wake around 08:00, and moves training away from late evenings after lab.",
+          sources: ["Health", "Calendar"]
+        },
+        {
+          rule: "Trains six days a week at the gym.",
+          assumption: "Getting to the gym is practical in every kind of weather.",
+          clone: "When Weather shows rain on a cycling day, suggests a 20-minute bodyweight session at home instead.",
+          sources: ["Weather"]
+        }
+      ],
+      downloaded: [
+        {
+          rule: "Checks the live occupancy count before the 5:30 drive to a 24-hour gym.",
+          assumption: "Kenta's gym has a live crowd feed and he can drive there before dawn.",
+          clone: "Looks for a live count at the municipal gym and plans a 5:30 arrival. Neither fits Kenta's gym or travel.",
+          sources: []
+        },
+        {
+          rule: "Targets about 1 g protein per lb, mostly from two steaks a day and whey.",
+          assumption: "Beef every day fits the local food prices and routine.",
+          clone: "Keeps the original two-steak-and-whey menu and US serving assumptions, without using Kenta's food budget or usual shops.",
+          sources: []
+        },
+        {
+          rule: "Tracks whey by the pound and buys when a large bag gets cheaper.",
+          assumption: "US brands, US units, and the creator's shopping pattern.",
+          clone: "Tracks the creator's large-bag brand in price per pound, with no domestic brand or yen-per-kilogram history.",
+          sources: []
+        },
+        {
+          rule: "Sleeps 22:00–05:00 and trains before work.",
+          assumption: "A 05:00 wake-up works for this person's sleep and day.",
+          clone: "Keeps Dale's 05:00 wake and early gym session, even though Kenta usually sleeps around 01:00.",
+          sources: []
+        },
+        {
+          rule: "Trains six days a week at the gym.",
+          assumption: "Getting to the gym is practical in every kind of weather.",
+          clone: "Keeps all six gym trips in the plan, including rainy days when Kenta would otherwise cycle.",
+          sources: []
+        }
+      ]
+    };
+
+    const sourceClass = {
+      Chat: "chat",
+      Map: "map",
+      Calendar: "calendar",
+      Health: "health",
+      Weather: "weather",
+      Bitácora: "bitacora"
+    };
+
+    const renderTraining = (mode) => {
+      const root = document.querySelector("#training-rows");
+      root.innerHTML = trainingRows[mode].map((row, index) => {
+        const chips = row.sources.length
+          ? `<div class="source-chips" aria-label="Sources used">${row.sources.map((source) => `<span class="source-chip chip-${sourceClass[source]}">${source}</span>`).join("")}</div>`
+          : `<div class="source-chips"><span class="source-chip">No personal sources</span></div>`;
+        const detail = mode === "adapted" && row.detail === "costs" ? costTable() : "";
+        return `<article class="adapt-row"><div class="adapt-cell"><span class="micro-label">${String(index + 1).padStart(2, "0")} · Dale's agent</span><p>${row.rule}</p></div><div class="adapt-cell"><span class="micro-label">What it assumes</span><p>${row.assumption}</p></div><div class="adapt-cell clone-cell"><span class="micro-label">Kenta's clone</span><p>${row.clone}</p>${chips}${detail}</div></article>`;
+      }).join("");
+      document.querySelector("#training-status").textContent = mode === "adapted"
+        ? "Showing the plan adapted for Kenta."
+        : "Showing Dale's plan as downloaded, before Kenta's context is applied.";
+    };
+
+    document.querySelectorAll("[data-training-mode]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const mode = button.dataset.trainingMode;
+        document.querySelectorAll("[data-training-mode]").forEach((item) => {
+          item.setAttribute("aria-pressed", String(item === button));
+        });
+        renderTraining(mode);
+      });
+    });
+    renderTraining("adapted");
+
+    const range = document.querySelector("#allocation-range");
+    const yen = new Intl.NumberFormat("ja-JP", { maximumFractionDigits: 0 });
+    const updateAllocation = () => {
+      const maple = Number(range.value);
+      const tape = 100 - maple;
+      const total = 30000;
+      document.querySelector("#maple-amount").textContent = `¥${yen.format(total * maple / 100)}`;
+      document.querySelector("#tape-amount").textContent = `¥${yen.format(total * tape / 100)}`;
+      document.querySelector("#maple-share").textContent = String(maple);
+      document.querySelector("#tape-share").textContent = String(tape);
+      document.querySelector("#allocation-output").textContent = `${maple}% / ${tape}%`;
+      range.setAttribute("aria-valuetext", `Maple Value ${maple} percent, Tape Reader ${tape} percent`);
+    };
+    range.addEventListener("input", updateAllocation);
+    updateAllocation();
+  })();
+</script>
+</body>
+</html>
